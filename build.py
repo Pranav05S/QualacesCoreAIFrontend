@@ -104,7 +104,7 @@ SOCIAL = [
     ("YouTube", "https://www.youtube.com/@qualaces"),
 ]
 
-NAV = [("Home", "index.html"), ("Services", "services.html"), ("Products", "products.html"),
+NAV = [("Home", "index.html"), ("Services", "services.html"), ("Free audit", "audit.html"), ("Products", "products.html"),
        ("Careers", "careers.html"), ("About us", "about-us.html")]
 
 ARROW = '<span class="arr" aria-hidden="true">→</span>'
@@ -137,12 +137,12 @@ def footer(flush=False):
 <div class="foot-grid">
 <div><a class="foot-brand" href="index.html"><img src="assets/img/mark.png" alt="" width="38" height="38"><span>qualaces<span class="dot">.</span></span></a>
 <p>Qualaces is a software and quality testing services company that provides a wide range of services to ensure the success of your software.</p></div>
-<div><h4>Explore</h4><ul><li><a href="services.html">Services</a></li><li><a href="products.html">Products · QTM</a></li><li><a href="careers.html">Careers</a></li><li><a href="about-us.html">About us</a></li><li><a href="privacy-policy.html">Privacy policy</a></li></ul></div>
-<div><h4>Contact</h4><ul><li><a href="mailto:info@qualaces.com">info@qualaces.com</a></li><li><a href="tel:+15873196658">+1 (587) 319-6658</a></li><li>Calgary, Alberta<br>Canada</li><li><a href="contact-us.html">Send a message</a></li></ul></div>
-<div><h4>Follow</h4><ul>{soc}</ul></div>
+<div><h2>Explore</h2><ul><li><a href="services.html">Services</a></li><li><a href="audit.html">Free site audit</a></li><li><a href="products.html">Products · QTM</a></li><li><a href="careers.html">Careers</a></li><li><a href="about-us.html">About us</a></li><li><a href="privacy-policy.html">Privacy policy</a></li></ul></div>
+<div><h2>Contact</h2><ul><li><a href="mailto:info@qualaces.com">info@qualaces.com</a></li><li><a href="tel:+15873196658">+1 (587) 319-6658</a></li><li>Calgary, Alberta<br>Canada</li><li><a href="contact-us.html">Send a message</a></li></ul></div>
+<div><h2>Follow</h2><ul>{soc}</ul></div>
 </div>
 <div class="foot-bottom"><span>© 2021–2026 Qualaces. All rights reserved.</span><span>Quality, on purpose.</span></div>
-<div class="wordmark-bg" aria-hidden="true">qualaces.</div>
+<div class="wordmark-bg" aria-hidden="true"></div>
 </div></footer>
 <button class="back-top" type="button" aria-label="Back to top">↑</button>
 <div class="pal" id="pal" role="dialog" aria-modal="true" aria-label="Quick navigation"><div class="pal-box">
@@ -156,7 +156,7 @@ def cta(title="Have a project in mind?", text="Start the collaboration with us w
 <a class="btn green" href="{href}">Contact us {ARROW}</a></div></section>'''
 
 
-def page(fname, title, desc, active, body, *, head_extra="", flush=False, body_class=""):
+def page(fname, title, desc, active, body, *, head_extra="", foot_extra="", flush=False, body_class=""):
     canon = SITE + ("/" if fname == "index.html" else "/" + fname)
     doc = f'''<!doctype html>
 <html lang="en" class="no-js">
@@ -180,6 +180,7 @@ def page(fname, title, desc, active, body, *, head_extra="", flush=False, body_c
 {body}
 </main>
 {footer(flush)}
+{foot_extra}
 </body></html>
 '''
     (ROOT / fname).write_text(doc, encoding="utf-8")
@@ -281,6 +282,7 @@ def home():
 <p style="margin-top:34px"><a class="btn" href="services.html">See every service {ARROW}</a></p>
 </div></section>
 
+{teaser()}
 <section class="sec dark on-dark"><div class="wrap qtm-grid">
 <div class="rv"><span class="badge" style="color:var(--green-bright)">Our product</span>
 <h2 class="h-lg" style="margin:22px 0 20px">Meet QTM. <span class="mark">Test without writing code.</span></h2>
@@ -291,7 +293,7 @@ def home():
 <li><span class="tick">✓</span><div><b>Visual testing with AI</b><span>AI-driven visual detection that flags design flaws and UI inconsistencies.</span></div></li>
 </ul>
 <a class="btn green" href="products.html">Explore QTM {ARROW}</a></div>
-<div class="rv" style="--d:.1s"><div class="mock" aria-hidden="true"><div class="mock-bar"><span>● ● ●</span><span>QTM · Test cases</span><span class="tag">illustrative</span></div>
+<div class="rv" style="--d:.1s"><div class="mock" role="group" aria-label="Illustrative QTM test case list"><div class="mock-bar"><span aria-hidden="true">● ● ●</span><span>QTM · Test cases</span><span class="tag">illustrative</span></div>
 <div class="mock-body">
 <div class="mrow"><span class="id">TC-101</span><span>Checkout with saved card</span><span class="st ok">PASSED</span></div>
 <div class="mrow"><span class="id">TC-102</span><span>Apply discount code</span><span class="st ok">PASSED</span></div>
@@ -306,6 +308,81 @@ def home():
          "index.html", body, head_extra=f'<script type="application/ld+json">{ld}</script>')
 
 
+
+def sample_report():
+    f = ROOT / "assets/data/sample-report.json"
+    return json.loads(f.read_text(encoding="utf-8")) if f.exists() else None
+
+
+def teaser():
+    r = sample_report()
+    if not r:
+        return ""
+    bars = ""
+    for c, label in [("performance", "Performance"), ("accessibility", "Accessibility"), ("seo", "SEO"), ("security", "Security"), ("reliability", "Reliability"), ("mobile", "Mobile")]:
+        v = r["scores"][c]
+        tone = "good" if v >= 90 else "ok" if v >= 70 else "bad"
+        bars += f'<div class="cat"><span class="n">{label}</span><div class="bar" role="img" aria-label="{label} {v} out of 100"><i class="fill {tone}" style="width:{v}%"></i></div><span class="v">{v}</span></div>'
+    return f"""
+<section class="sec" id="free-audit" style="padding-top:0"><div class="wrap teaser">
+<div class="rv"><p class="eyebrow"><b>Free tool</b> Site audit</p>
+<h2 class="h-lg" style="margin:22px 0 20px">See your site the way <span class="mark">a tester does.</span></h2>
+<p class="lede">Enter a web address. We load it in a real browser, measure speed, accessibility, security headers, mobile layout and links, then turn the findings into a test plan mapped to our services.</p>
+<div class="cta-row" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:30px"><a class="btn" href="audit.html">Audit your site {ARROW}</a><a class="btn ghost" href="audit.html#sample">See a sample report</a></div></div>
+<div class="rv" style="--d:.1s"><div class="mini-report" role="group" aria-label="Sample audit scores"><div class="top"><span>Sample · previous qualaces.com</span><span>{r["auditedAt"][:10]}</span></div>
+<div class="score"><b>{r["scores"]["overall"]}</b><span>/ 100 · grade {r["scores"]["grade"]}</span></div><div class="cats">{bars}</div></div></div>
+</div></section>"""
+
+
+def audit():
+    checks = [
+        ("Performance", "Time to first byte, first and largest paint, layout shift, blocking time, page weight, request count, compression and caching."),
+        ("Accessibility", "An axe-core scan against WCAG 2.1 A and AA plus best practices: contrast, labels, alt text, headings, landmarks and ARIA."),
+        ("SEO", "Title, description, headings, canonical link, social sharing tags, robots.txt, sitemap, and whether content only appears after JavaScript runs."),
+        ("Security", "HTTPS and redirect, HSTS, Content-Security-Policy, framing and sniffing protection, referrer policy, cookie flags, mixed content and certificate coverage."),
+        ("Reliability", "Console errors, uncaught exceptions, failed requests, error responses and a sample of broken links."),
+        ("Mobile", "Viewport setting, sideways scrolling at phone width, tap target size and tiny text."),
+    ]
+    grid = "".join(f'<div class="rv"><span class="k">0{i}</span><h3>{t}</h3><p>{d}</p></div>' for i, (t, d) in enumerate(checks, 1))
+    body = f"""
+<section class="page-head"><div class="wrap"><p class="eyebrow"><b>Free audit</b> Passive, about a minute</p>
+<h1 class="h-xl" style="font-size:clamp(2.6rem,6.4vw,5.4rem)">See your site the way <span class="mark">a tester does.</span></h1>
+<p class="lede">Enter a web address. We load it in a real browser, measure speed, accessibility, security headers, mobile layout and links, then turn what we find into a test plan mapped to our services.</p></div></section>
+
+<section class="audit-intake sec-tight" style="padding-top:0"><div class="wrap">
+<p class="offline" id="audit-offline" hidden>Live scanning is not connected on this deployment yet. You can still explore a real sample report.</p>
+<form class="audit-form" id="audit-form" novalidate>
+<div class="audit-row"><div class="url"><label class="lbl" for="audit-url">Website address</label><input type="text" id="audit-url" name="url" inputmode="url" autocomplete="url" placeholder="yourcompany.com" spellcheck="false" autocapitalize="none"></div>
+<button class="btn go" id="audit-run" type="submit">Run audit <span class="arr" aria-hidden="true">→</span></button></div>
+<label class="consent"><input type="checkbox" id="audit-consent"><span>I own this site or have permission to test it.</span></label>
+<p class="audit-err" id="audit-err" role="alert"></p>
+<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center"><button class="btn ghost sm" id="audit-sample" type="button">See a sample report</button>
+<p class="audit-note">Passive checks only: we load the page like a visitor and read public headers. We never log in, submit forms or try to break in.</p></div>
+</form></div></section>
+
+<section class="wrap" style="padding-bottom:24px"><div class="progress-card" id="audit-progress" hidden aria-live="polite"></div></section>
+<section class="wrap" id="report-wrap"><div class="report" id="audit-report" hidden></div></section>
+
+<section class="sec"><div class="wrap"><div class="sec-head rv"><p class="eyebrow"><b>What we check</b> Six areas</p><h2 class="h-lg">Measured, not guessed.</h2>
+<p class="lede">Every finding comes from something the browser or the server actually reported. Each one says how serious it is, how to fix it, and where we can help.</p></div>
+<div class="checks-grid">{grid}</div></div></section>
+
+<section class="sec-tight" style="padding-top:0"><div class="wrap split">
+<div class="sticky"><p class="eyebrow"><b>From findings to a plan</b></p><h2 class="h-lg" style="margin-top:22px">The report ends with what to do next.</h2></div>
+<div><p class="lede" style="max-width:none;color:var(--ink)">The findings are ranked by severity and mapped to the testing services that address them, so you can see where to start and why.</p>
+<p>You get a phased plan (protect the basics, fix and verify, go deeper, keep it fixed) and a starter set of test cases built from your own results. The same findings always produce the same plan. Where an AI summary is enabled, it only rewrites the wording of the headline summary. It cannot change scores, services or test cases.</p>
+<p><strong>What it cannot do:</strong> it measures one page in one browser from one place, and it is not a penetration test. It tells you where to look. People still need to do the looking.</p>
+<p>Reports are held in memory for one hour and then discarded. Read how we handle data in the <a href="privacy-policy.html">privacy policy</a>.</p></div>
+</div></section>
+{cta("Prefer to talk it through?", "Tell us about your site and we will plan the testing with you.")}
+"""
+    page("audit.html", "Free Website Audit | Qualaces",
+         "Run a free, passive audit of any public website: performance, accessibility, SEO, security headers, mobile layout and links, with a test strategy mapped to Qualaces services.",
+         "audit.html", body,
+         head_extra='<link rel="stylesheet" href="assets/css/audit.css">',
+         foot_extra='<script src="assets/js/config.js"></script><script src="assets/js/audit.js"></script>')
+
+
 def services():
     chips = '<button class="chip" type="button" data-cat="all" aria-pressed="true">All</button>' + "".join(
         f'<button class="chip" type="button" data-cat="{k}" aria-pressed="false">{v}</button>' for k, v in CATS)
@@ -313,7 +390,7 @@ def services():
     for k, v in CATS:
         lst += f'<li class="grp" data-cat="{k}">{v}</li>'
         for s in [x for x in SERVICES if x["cat"] == k]:
-            lst += f'<li><button class="svc-btn" type="button" data-id="{s["id"]}" data-cat="{k}" aria-selected="false">{s["name"]}</button></li>'
+            lst += f'<li><button class="svc-btn" type="button" data-id="{s["id"]}" data-cat="{k}">{s["name"]}</button></li>'
     # the .grp header should be an li too, with class on li itself
     panels = ""
     for s in SERVICES:
@@ -369,7 +446,7 @@ def products():
 <div><div class="mock"><div class="mock-bar"><span>QTM</span><span class="tag">illustrative preview</span></div>{d[4]}</div></div></div>''' for d in demos)
 
     body = f'''
-<section class="page-head"><div class="wrap"><span class="badge" style="color:var(--violet)">Product</span>
+<section class="page-head"><div class="wrap"><span class="badge" style="color:var(--violet-ink)">Product</span>
 <h1 class="h-xl" style="margin:24px 0 26px;font-size:clamp(2.6rem,6.4vw,5.4rem)">QTM: a <span class="mark">powerful</span> software testing tool.</h1>
 <p class="lede">Empower your team to create and run tests without writing a single line of code, using the power of ChatGPT and AI. Seamlessly integrate with your development workflow and let AI handle the heavy lifting.</p>
 <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:32px"><a class="btn" href="contact-us.html?topics=QTM&amp;note=I%27d%20like%20to%20sign%20up%20for%20QTM.#form">Sign up for QTM {ARROW}</a><a class="btn ghost" href="#features">See what it does</a></div></div></section>
@@ -502,6 +579,8 @@ def privacy():
 <h2>Information we collect</h2>
 <ul><li><strong>Information you provide.</strong> We collect information you voluntarily provide, such as your name, email address, and any other information you choose to provide when contacting us or using our services.</li>
 <li><strong>Automatically collected information.</strong> We may automatically collect certain information when you visit our Site, including your IP address, browser type, device type, and the pages you visit.</li></ul>
+<h2>Free site audit tool</h2>
+<p>If you use the free site audit, we process the web address you enter, load that page and a small sample of its links, and read public response headers. Results are held in memory for one hour and then discarded. To prevent abuse we rate-limit requests by IP address. We do not log in to your site, submit forms or attempt to exploit anything.</p>
 <h2>Cookies and similar technologies</h2>
 <p>We use cookies and similar technologies to collect information about your preferences and browsing behavior on our Site. You can control cookies through your browser settings and other tools. However, disabling certain cookies may affect the functionality of the Site.</p>
 <h2>How we use your information</h2>
@@ -532,7 +611,7 @@ def notfound():
 def extras():
     data = [{"id": s["id"], "name": s["name"]} for s in SERVICES]
     (ROOT / "assets/js/data.js").write_text("window.QA_SERVICES=" + json.dumps(data) + ";\n", encoding="utf-8")
-    pages = ["", "services.html", "products.html", "careers.html", "about-us.html", "contact-us.html", "privacy-policy.html"]
+    pages = ["", "services.html", "audit.html", "products.html", "careers.html", "about-us.html", "contact-us.html", "privacy-policy.html"]
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(
         f"  <url><loc>{SITE}/{p}</loc></url>\n" for p in pages) + "</urlset>\n"
     (ROOT / "sitemap.xml").write_text(sm)
@@ -544,5 +623,5 @@ def extras():
 
 
 if __name__ == "__main__":
-    for fn in (home, services, products, careers, about, contact, privacy, notfound, extras):
+    for fn in (home, services, audit, products, careers, about, contact, privacy, notfound, extras):
         fn()

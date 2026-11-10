@@ -188,7 +188,7 @@
     var btns = $$(".svc-btn", exp), panels2 = $$(".svc-panel", exp), chips = $$(".chip", exp);
     var show = function (id, push) {
       var ok = false;
-      btns.forEach(function (b) { var on = b.dataset.id === id; b.setAttribute("aria-selected", on); if (on) ok = true; });
+      btns.forEach(function (b) { var on = b.dataset.id === id; if (on) { b.setAttribute("aria-current", "true"); ok = true; } else b.removeAttribute("aria-current"); });
       panels2.forEach(function (p) { p.hidden = p.dataset.id !== id; });
       if (!ok) return show(btns[0].dataset.id, push);
       if (push) history.replaceState(null, "", "#" + id);
@@ -291,7 +291,7 @@
     var input = $("input", pal), list = $("ul", pal), sel = 0, shown = [];
     var base = document.documentElement.getAttribute("data-root") || "";
     var items = [
-      ["Home", "index.html", "Page"], ["Services", "services.html", "Page"], ["Products · QTM", "products.html", "Page"],
+      ["Home", "index.html", "Page"], ["Services", "services.html", "Page"], ["Free site audit", "audit.html", "Tool"], ["Products · QTM", "products.html", "Page"],
       ["Careers & mentorship", "careers.html", "Page"], ["About us", "about-us.html", "Page"], ["Contact us", "contact-us.html", "Page"],
       ["Privacy policy", "privacy-policy.html", "Page"], ["Email info@qualaces.com", "mailto:info@qualaces.com", "Action"]
     ].concat((window.QA_SERVICES || []).map(function (s) { return [s.name, "services.html#" + s.id, "Service"]; }));

@@ -10,3 +10,11 @@ Static site: plain HTML, CSS and vanilla JS. No framework and no bundler, so it 
 
 ## Deploying
 Pushes to `main` publish the site via GitHub Pages (`.github/workflows/pages.yml`). One-time setup: repo **Settings → Pages → Source: GitHub Actions**.
+
+## Free audit tool
+`/audit.html` is an interactive site auditor: enter a URL and get scores, findings and a test strategy mapped to Qualaces services.
+
+- **Front end** (this site): `assets/js/audit.js`, `assets/css/audit.css`. It runs in sample-report mode out of the box (`assets/data/sample-report.json`, a real audit of the previous qualaces.com).
+- **Back end**: `audit-server/` (Node + Playwright). It needs a host that runs containers, because GitHub Pages is static. See `audit-server/README.md` for deployment, the security model and limits.
+- **Connect them** by setting `window.QA_AUDIT_API` in `assets/js/config.js` to the deployed service URL.
+
